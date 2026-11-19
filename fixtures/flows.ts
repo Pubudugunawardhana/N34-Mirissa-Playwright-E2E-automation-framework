@@ -62,11 +62,15 @@ export async function createGuestBooking(
   });
 
   const total = await test.step('Fill in the booking form', async () => {
+    // "N rooms left" comes from a client-side availability check, so it only shows once React is running.
+    // The fields are React-controlled: anything typed before hydration is reset (seen on WebKit).
+    await expect(bookingPage.roomsLeftMessage).toBeVisible();
     await bookingPage.fillGuestDetails(booking);
     if (booking.mealPlan) await bookingPage.chooseMealPlan(booking.mealPlan);
     if (booking.specialRequests) await bookingPage.specialRequestsInput.fill(booking.specialRequests);
-    // The button only becomes active once the availability check for the dates has come back.
-    await expect(bookingPage.roomsLeftMessage).toBeVisible();
+    await expect(bookingPage.guestNameInput).toHaveValue(booking.guestName);
+    await expect(bookingPage.phoneInput).toHaveValue(booking.phone);
+    await expect(bookingPage.emailInput).toHaveValue(booking.email);
     return bookingPage.getTotal();
   });
 

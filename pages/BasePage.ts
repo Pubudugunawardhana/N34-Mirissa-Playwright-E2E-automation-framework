@@ -17,8 +17,12 @@ export abstract class BasePage {
     this.heading = page.getByRole('heading', { level: 1 });
   }
 
-  /** Opens the page. A relative path, so the baseURL from the config applies. */
+  /**
+   * Opens the page. A relative path, so the baseURL from the config applies.
+   * Waits for the HTML, not every image: assertions wait for the elements they need,
+   * and image-heavy pages (Dining, Experiences) can take long to fire "load" on a slow CI runner.
+   */
   async goto(query = '') {
-    await this.page.goto(`${this.path}${query}`);
+    await this.page.goto(`${this.path}${query}`, { waitUntil: 'domcontentloaded' });
   }
 }
