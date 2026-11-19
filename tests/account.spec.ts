@@ -67,12 +67,11 @@ test.describe('My account', () => {
       await test.step('Save a new name and phone', async () => {
         await accountPage.gotoProfile();
         // The fields are React-controlled: typing before hydration finishes gets reset (seen on WebKit).
-        await page.waitForLoadState('networkidle');
+        // "Show password" only toggles once React is running, so it proves the page is hydrated.
         await expect(async () => {
-          await accountPage.profileNameInput.fill(updated.name);
-          await accountPage.profilePhoneInput.fill(updated.phone);
-          await expect(accountPage.profileNameInput).toHaveValue(updated.name, { timeout: 1_000 });
-        }).toPass({ timeout: 10_000 });
+          await page.getByRole('button', { name: 'Show password' }).first().click();
+          await expect(page.getByRole('button', { name: 'Hide password' }).first()).toBeVisible({ timeout: 1_000 });
+        }).toPass({ timeout: 15_000 });
         await accountPage.updateProfile(updated);
         await expect(accountPage.successMessage).toHaveText(testData.messages.profileSaved);
       });
