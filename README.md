@@ -8,7 +8,7 @@ End-to-end UI tests for **N34 Mirissa**, a full-stack beach hotel booking platfo
 [![Allure Report](https://img.shields.io/badge/Allure%20Report-live-orange?logo=qameta&logoColor=white)](https://pubudugunawardhana.github.io/N34-Mirissa-Playwright-E2E-automation-framework/)
 ![Playwright](https://img.shields.io/badge/Playwright-1.65-2EAD33?logo=playwright&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 **📊 [View the live Allure test report](https://pubudugunawardhana.github.io/N34-Mirissa-Playwright-E2E-automation-framework/)**: updated by CI on every push to `main`.
 
@@ -27,6 +27,8 @@ End-to-end UI tests for **N34 Mirissa**, a full-stack beach hotel booking platfo
 - [CI/CD](#cicd)
 - [Writing new tests](#writing-new-tests)
 - [Debugging](#debugging)
+- [Security](#security)
+- [License](#license)
 
 ## Highlights
 
@@ -237,6 +239,10 @@ flowchart LR
 - Step through a test with `npm run test:debug -- tests/booking.spec.ts`.
 - If the app won't start, run its build in the app folder to see the error: `npm run build`. The webServer only shows stderr.
 
+## Security
+
+Please don't report security issues in public issues. See [SECURITY.md](SECURITY.md) for how to report them privately and what's in scope.
+
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
