@@ -71,8 +71,12 @@ test.describe('My account', () => {
       });
 
       await test.step('Verify the change after a reload', async () => {
-        await page.reload();
-        await expect(accountPage.profileNameInput).toHaveValue(updated.name);
+        await expect(accountPage.saveChangesButton).toBeEnabled();
+        // Reload until the saved values come back (WebKit can serve the page before the save has landed).
+        await expect(async () => {
+          await page.reload();
+          await expect(accountPage.profileNameInput).toHaveValue(updated.name, { timeout: 2_000 });
+        }).toPass({ timeout: 20_000 });
         await expect(accountPage.profilePhoneInput).toHaveValue(updated.phone);
         await expect(accountPage.heading).toHaveText(`Welcome, ${updated.name}`);
       });

@@ -19,7 +19,8 @@ export class AdminBookingsPage {
   readonly cancelDialog: ConfirmDialog;
 
   constructor(readonly page: Page) {
-    this.heading = page.getByRole('heading', { level: 1 });
+    // Inside <main>: the admin layout's top bar has its own <h1>Overview</h1>.
+    this.heading = page.locator('main').getByRole('heading', { level: 1 });
     this.sidebar = page.locator('aside');
     this.searchInput = page.getByRole('searchbox', { name: 'Search bookings' });
     this.bookingRows = page.locator('main ul > li');

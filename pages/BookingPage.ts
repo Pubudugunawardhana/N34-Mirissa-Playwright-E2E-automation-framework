@@ -82,11 +82,8 @@ export class BookingPage extends BasePage {
 
   /** The value cell (<dd>) next to a summary label (<dt>) such as "Guests" or "Total". */
   summaryRow(label: string): Locator {
-    return this.summary
-      .locator('div')
-      .filter({ has: this.page.locator('dt', { hasText: new RegExp(`^${label}$`) }) })
-      .locator('dd')
-      .first();
+    // Straight from the <dt> to the <dd> beside it: a container <div> would also hold the other rows.
+    return this.summary.locator('dt', { hasText: new RegExp(`^${label}$`) }).locator('xpath=following-sibling::dd[1]');
   }
 
   async fillGuestDetails({ guestName, phone, email }: GuestDetails) {
