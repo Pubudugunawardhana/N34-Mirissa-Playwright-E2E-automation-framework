@@ -4,10 +4,13 @@
 
 End-to-end UI tests for **N34 Mirissa**, a full-stack beach hotel booking platform (Next.js 16 · Server Actions · Prisma · PostgreSQL · NextAuth).
 
+[![Playwright E2E Tests](https://github.com/Pubudugunawardhana/N34-Mirissa-Playwright-E2E-automation-framework/actions/workflows/playwright.yml/badge.svg)](https://github.com/Pubudugunawardhana/N34-Mirissa-Playwright-E2E-automation-framework/actions/workflows/playwright.yml)
+[![Allure Report](https://img.shields.io/badge/Allure%20Report-live-orange?logo=qameta&logoColor=white)](https://pubudugunawardhana.github.io/N34-Mirissa-Playwright-E2E-automation-framework/)
 ![Playwright](https://img.shields.io/badge/Playwright-1.65-2EAD33?logo=playwright&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
-![Allure](https://img.shields.io/badge/Report-Allure%203-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
+
+**📊 [View the live Allure test report](https://pubudugunawardhana.github.io/N34-Mirissa-Playwright-E2E-automation-framework/)**: updated by CI on every push to `main`.
 
 </div>
 
