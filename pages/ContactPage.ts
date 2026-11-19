@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { waitForHydration } from '../utils/hydration';
 import { BasePage } from './BasePage';
 
 export type ContactMessage = {
@@ -46,6 +47,7 @@ export class ContactPage extends BasePage {
   }
 
   async sendMessage({ name, email, phone, subject, message, consent = true }: ContactMessage) {
+    await waitForHydration(this.nameInput); // controlled fields
     await this.nameInput.fill(name);
     await this.emailInput.fill(email);
     if (phone) await this.phoneInput.fill(phone);

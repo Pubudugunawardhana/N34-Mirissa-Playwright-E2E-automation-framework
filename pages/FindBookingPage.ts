@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { waitForHydration } from '../utils/hydration';
 import { BasePage } from './BasePage';
 
 /** /book/find — a guest without an account looks a booking up by reference and email. */
@@ -19,6 +20,8 @@ export class FindBookingPage extends BasePage {
   }
 
   async find(reference: string, email: string) {
+    // Controlled fields: typing before hydration is lost.
+    await waitForHydration(this.referenceInput);
     await this.referenceInput.fill(reference);
     await this.emailInput.fill(email);
     await this.findButton.click();

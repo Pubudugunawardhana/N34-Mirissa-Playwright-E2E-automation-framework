@@ -26,18 +26,18 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Check out the test framework
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # The app under test lives in its own repository. If it is private, add a token with read access as APP_REPO_TOKEN.
       - name: Check out the N34 Mirissa app
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: Pubudugunawardhana/N34-Mirissa
           ref: master
           path: app
           token: ${{ secrets.APP_REPO_TOKEN || github.token }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: lts/*
           cache: npm
@@ -55,11 +55,12 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      # The key includes the attempt, so a re-run can save its own history instead of failing on an existing key.
       - name: Restore Allure history
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: allure-history
-          key: allure-history-${{ github.run_id }}
+          key: allure-history-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: allure-history-
 
       - name: Type-check and lint
@@ -82,23 +83,25 @@ jobs:
 
       - name: Save Allure history
         if: ${{ !cancelled() }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: allure-history
-          key: allure-history-${{ github.run_id }}
+          key: allure-history-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Upload Playwright HTML report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-${{ github.run_attempt }}
           path: playwright-report/
           retention-days: 30
 
       - name: Upload Allure report for GitHub Pages
         if: ${{ !cancelled() && github.event_name != 'pull_request' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
+          # One name per attempt: a re-run would otherwise leave two "github-pages" artifacts and the deploy fails.
+          name: github-pages-${{ github.run_attempt }}
           path: allure-report
 
   deploy-report:
@@ -111,4 +114,6 @@ jobs:
     steps:
       - name: Deploy Allure report to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}

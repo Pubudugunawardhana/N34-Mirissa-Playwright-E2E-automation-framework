@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { waitForHydration } from '../../utils/hydration';
 
 /** /admin/settings — contacts, map and the site status switches (src/components/admin/SettingsForm.tsx). */
 export class AdminSettingsPage {
@@ -27,6 +28,7 @@ export class AdminSettingsPage {
 
   /** Sets both switches and saves. */
   async setSiteStatus({ bookingsPaused, maintenance }: { bookingsPaused: boolean; maintenance: boolean }) {
+    await waitForHydration(this.pauseBookingSwitch); // controlled switches
     await this.setSwitch(this.pauseBookingSwitch, bookingsPaused);
     await this.setSwitch(this.maintenanceSwitch, maintenance);
     await this.saveButton.click();

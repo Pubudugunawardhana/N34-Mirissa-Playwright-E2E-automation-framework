@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import { SelectMenu } from '../components/SelectMenu';
+import { waitForHydration } from '../utils/hydration';
 import { parseLKR } from '../utils/price';
 import { BasePage } from './BasePage';
 
@@ -87,12 +88,14 @@ export class BookingPage extends BasePage {
   }
 
   async fillGuestDetails({ guestName, phone, email }: GuestDetails) {
+    await waitForHydration(this.guestNameInput); // controlled fields
     await this.guestNameInput.fill(guestName);
     await this.phoneInput.fill(phone);
     await this.emailInput.fill(email);
   }
 
   async fillStay({ checkIn, checkOut, adults, children }: StayDetails) {
+    await waitForHydration(this.checkInInput); // controlled fields
     await this.checkInInput.fill(checkIn);
     await this.checkOutInput.fill(checkOut);
     if (adults) await this.adults.choose(adults);

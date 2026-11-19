@@ -66,12 +66,7 @@ test.describe('My account', () => {
 
       await test.step('Save a new name and phone', async () => {
         await accountPage.gotoProfile();
-        // The fields are React-controlled: typing before hydration finishes gets reset (seen on WebKit).
-        // "Show password" only toggles once React is running, so it proves the page is hydrated.
-        await expect(async () => {
-          await page.getByRole('button', { name: 'Show password' }).first().click();
-          await expect(page.getByRole('button', { name: 'Hide password' }).first()).toBeVisible({ timeout: 1_000 });
-        }).toPass({ timeout: 15_000 });
+        // updateProfile() waits for React to hydrate the form before typing (see utils/hydration.ts).
         await accountPage.updateProfile(updated);
         await expect(accountPage.successMessage).toHaveText(testData.messages.profileSaved);
       });

@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { waitForHydration } from '../utils/hydration';
 import { BasePage } from './BasePage';
 
 /** /user — "My bookings" and "Profile settings" for a signed-in guest. */
@@ -60,6 +61,7 @@ export class AccountPage extends BasePage {
   }
 
   async updateProfile({ name, phone }: { name: string; phone: string }) {
+    await waitForHydration(this.profileNameInput); // controlled fields
     await this.profileNameInput.fill(name);
     await this.profilePhoneInput.fill(phone);
     await this.saveChangesButton.click();
