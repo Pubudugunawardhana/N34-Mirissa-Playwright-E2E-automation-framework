@@ -1,0 +1,114 @@
+name: Playwright E2E Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  # One run at a time: every run wipes and re-seeds the same test database.
+  group: n34-e2e
+  cancel-in-progress: false
+
+env:
+  APP_DIR: app
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out the test framework
+        uses: actions/checkout@v4
+
+      # The app under test lives in its own repository. If it is private, add a token with read access as APP_REPO_TOKEN.
+      - name: Check out the N34 Mirissa app
+        uses: actions/checkout@v4
+        with:
+          repository: Pubudugunawardhana/N34-Mirissa
+          ref: master
+          path: app
+          token: ${{ secrets.APP_REPO_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
+
+      - name: Install the app
+        working-directory: app
+        run: npm ci
+
+      - name: Install the test framework
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Restore Allure history
+        uses: actions/cache/restore@v4
+        with:
+          path: allure-history
+          key: allure-history-${{ github.run_id }}
+          restore-keys: allure-history-
+
+      - name: Type-check and lint
+        run: npm run typecheck && npm run lint
+
+      # webServer in playwright.config.ts resets + seeds the test database, then builds and starts the app.
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          BASE_URL: http://localhost:3100
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          ADMIN_USERNAME: admin
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin' }}
+          RESET_DB: 'true'
+
+      - name: Generate Allure report
+        if: ${{ !cancelled() }}
+        run: npx allure generate ./allure-results
+
+      - name: Save Allure history
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v4
+        with:
+          path: allure-history
+          key: allure-history-${{ github.run_id }}
+
+      - name: Upload Playwright HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Allure report for GitHub Pages
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+  deploy-report:
+    needs: test
+    if: ${{ always() && needs.test.result != 'cancelled' && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Allure report to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

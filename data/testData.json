@@ -1,0 +1,182 @@
+{
+  "rooms": {
+    "deluxe": { "name": "Deluxe Ocean View Room", "price": 28000, "area": 420, "maxAdults": 2, "maxChildren": 1 },
+    "family": { "name": "Family Garden Suite", "price": 42000, "area": 680, "maxAdults": 4, "maxChildren": 2 },
+    "villa": { "name": "Beachfront Pool Villa", "price": 75000, "area": 1100, "maxAdults": 2, "maxChildren": 2 }
+  },
+
+  "mealPlans": [
+    { "label": "Room Only", "pricePerGuestNight": 0 },
+    { "label": "Breakfast", "pricePerGuestNight": 1500 },
+    { "label": "Half Board", "pricePerGuestNight": 3500 },
+    { "label": "Full Board", "pricePerGuestNight": 5500 }
+  ],
+
+  "sortScenarios": [
+    { "label": "Price: low to high", "by": "price", "order": "asc", "expectedFirst": "Deluxe Ocean View Room" },
+    { "label": "Price: high to low", "by": "price", "order": "desc", "expectedFirst": "Beachfront Pool Villa" },
+    { "label": "Largest first", "by": "area", "order": "desc", "expectedFirst": "Beachfront Pool Villa" }
+  ],
+
+  "capacityScenarios": [
+    { "title": "3 adults", "adults": "3 Adults", "children": null, "expectedRooms": ["Family Garden Suite"] },
+    {
+      "title": "2 adults and 2 children",
+      "adults": "2 Adults",
+      "children": "2 Children",
+      "expectedRooms": ["Family Garden Suite", "Beachfront Pool Villa"]
+    },
+    {
+      "title": "1 adult",
+      "adults": "1 Adult",
+      "children": null,
+      "expectedRooms": ["Deluxe Ocean View Room", "Family Garden Suite", "Beachfront Pool Villa"]
+    }
+  ],
+
+  "stayBlockerScenarios": [
+    {
+      "title": "a check-in date in the past",
+      "checkInOffset": -2,
+      "checkOutOffset": 1,
+      "message": "Check-in cannot be in the past."
+    },
+    {
+      "title": "check-out before check-in",
+      "checkInOffset": 40,
+      "checkOutOffset": 38,
+      "message": "Check-out must be after check-in."
+    },
+    {
+      "title": "a stay longer than 30 nights",
+      "checkInOffset": 40,
+      "checkOutOffset": 75,
+      "message": "Stays are limited to 30 nights."
+    }
+  ],
+
+  "bookingFieldErrorScenarios": [
+    {
+      "title": "an invalid phone number",
+      "guestName": "Test Guest",
+      "phone": "abc",
+      "email": "guest@n34-e2e.test",
+      "field": "phone",
+      "error": "Please enter a valid phone number"
+    },
+    {
+      "title": "an invalid email",
+      "guestName": "Test Guest",
+      "phone": "071 234 5678",
+      "email": "not-an-email",
+      "field": "email",
+      "error": "Please enter a valid email address"
+    },
+    {
+      "title": "a one-letter name",
+      "guestName": "A",
+      "phone": "071 234 5678",
+      "email": "guest@n34-e2e.test",
+      "field": "guestName",
+      "error": "Please enter your name"
+    }
+  ],
+
+  "registerErrorScenarios": [
+    {
+      "title": "passwords that do not match",
+      "name": "Test Guest",
+      "password": "Mirissa2026!",
+      "confirmPassword": "Mirissa2027!",
+      "field": "confirmPassword",
+      "error": "Passwords do not match"
+    },
+    {
+      "title": "a password without a number",
+      "name": "Test Guest",
+      "password": "OnlyLetters",
+      "confirmPassword": "OnlyLetters",
+      "field": "password",
+      "error": "Password must include at least one number"
+    },
+    {
+      "title": "a password that is too short",
+      "name": "Test Guest",
+      "password": "abc1",
+      "confirmPassword": "abc1",
+      "field": "password",
+      "error": "Password must be at least 8 characters long"
+    },
+    {
+      "title": "a one-letter name",
+      "name": "A",
+      "password": "Mirissa2026!",
+      "confirmPassword": "Mirissa2026!",
+      "field": "name",
+      "error": "Name must be at least 2 characters long"
+    }
+  ],
+
+  "loginErrorScenarios": [
+    {
+      "title": "an unknown email",
+      "email": "nobody@n34-e2e.test",
+      "password": "Mirissa2026!",
+      "error": "Invalid email or password."
+    },
+    { "title": "a wrong password", "email": null, "password": "WrongPassword1", "error": "Invalid email or password." },
+    {
+      "title": "an empty password",
+      "email": "nobody@n34-e2e.test",
+      "password": "",
+      "error": "Please enter a valid email and password."
+    }
+  ],
+
+  "contactErrorScenarios": [
+    {
+      "title": "a message that is too short",
+      "overrides": { "message": "Hi" },
+      "field": "message",
+      "error": "Please write at least 10 characters"
+    },
+    {
+      "title": "no consent",
+      "overrides": { "consent": false },
+      "field": "consent",
+      "error": "Please confirm that we may store your details to reply"
+    },
+    {
+      "title": "an invalid email",
+      "overrides": { "email": "not-an-email" },
+      "field": "email",
+      "error": "Please enter a valid email address"
+    }
+  ],
+
+  "contactMessage": {
+    "name": "Test Guest",
+    "phone": "071 234 5678",
+    "subject": "Airport transfer",
+    "message": "Hello! Could you arrange a car from Colombo airport to the hotel for two people?"
+  },
+
+  "specialDinner": "Candlelit beach dinner",
+  "experience": {
+    "title": "Whale & dolphin watching",
+    "category": "OCEAN",
+    "categoryLabel": "Ocean & Wildlife",
+    "categoryTitles": ["Whale & dolphin watching", "Snorkelling with turtles"]
+  },
+
+  "messages": {
+    "bookingReceived": "Booking received",
+    "findBookingNotFound": "We could not find a booking with that reference and email. Please check both and try again.",
+    "adminAccessDenied": "This account does not have admin access.",
+    "bookingPaused": "Online booking is paused",
+    "maintenance": "We’ll be back soon",
+    "notFound": "Page not found",
+    "requestSent": "Request sent. We will reply by email to confirm the details.",
+    "profileSaved": "Your details are saved."
+  }
+}
