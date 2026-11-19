@@ -10,12 +10,17 @@ import { newGuestUser } from '../utils/testUser';
 // and if a guest registered first, the app would make that guest the admin.
 setup.describe.configure({ mode: 'serial' });
 
+// These are the first requests after the app starts on a freshly reset database. A sleeping Neon branch
+// has to wake up, and the first admin login also creates the default admin (with a bcrypt hash),
+// so allow far more than the usual 10 s here.
+const FIRST_REQUEST_TIMEOUT = 45_000;
+
 setup('authenticate as admin', async ({ page, adminLoginPage }) => {
   await labelTest({ feature: 'Test setup', story: 'Save admin session', severity: Severity.BLOCKER });
 
   await adminLoginPage.goto();
   await adminLoginPage.login(env.adminUsername, env.adminPassword);
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin$/, { timeout: FIRST_REQUEST_TIMEOUT });
 
   await page.context().storageState({ path: ADMIN_AUTH_FILE });
 });
@@ -26,11 +31,11 @@ setup('register and authenticate a guest', async ({ page, registerPage, loginPag
 
   await registerPage.goto();
   await registerPage.register(guest);
-  await expect(registerPage.heading).toHaveText('Check your inbox');
+  await expect(registerPage.heading).toHaveText('Check your inbox', { timeout: FIRST_REQUEST_TIMEOUT });
 
   await loginPage.goto();
   await loginPage.login(guest.email, guest.password);
-  await expect(page).toHaveURL(env.baseURL + '/');
+  await expect(page).toHaveURL(env.baseURL + '/', { timeout: FIRST_REQUEST_TIMEOUT });
 
   await page.context().storageState({ path: GUEST_AUTH_FILE });
   fs.mkdirSync(path.dirname(GUEST_USER_FILE), { recursive: true });
