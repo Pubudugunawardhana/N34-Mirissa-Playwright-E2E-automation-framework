@@ -97,10 +97,18 @@ test.describe('Admin', { tag: '@admin' }, () => {
         await expect(adminBookingsPage.bookingRow(booking.reference)).toContainText('Unpaid');
       });
 
-      await test.step('Mark it as paid', async () => {
+      await test.step('Mark it as paid, which opens the receipt', async () => {
         await adminBookingsPage.markPaid(booking.reference);
-        await expect(adminBookingsPage.bookingRow(booking.reference).getByText('Paid', { exact: true })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Mark unpaid' })).toBeVisible();
+        await expect(page).toHaveURL(new RegExp(`/admin/bookings/${booking.bookingId}/receipt$`));
+        await expect(page.locator('main')).toContainText(booking.reference);
+      });
+
+      await test.step('See it as paid in Booking records', async () => {
+        await adminBookingsPage.gotoRecords('upcoming', booking.reference);
+        const row = adminBookingsPage.bookingRow(booking.reference);
+        // Once paid, the badge links to the receipt.
+        await expect(row.locator('a[href$="/receipt"]')).toHaveText('Paid');
+        await expect(row.getByRole('button', { name: 'Mark unpaid' })).toBeVisible();
       });
     });
 
