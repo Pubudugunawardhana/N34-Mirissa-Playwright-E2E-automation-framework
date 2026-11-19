@@ -15,5 +15,5 @@
     "types": ["node"]
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "playwright-report", "test-results", "allure-report"]
+  "exclude": ["node_modules", "app", "playwright-report", "test-results", "allure-report"]
 }
