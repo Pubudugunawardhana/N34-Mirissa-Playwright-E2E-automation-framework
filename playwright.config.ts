@@ -57,22 +57,26 @@ export default defineConfig({
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
     // Everyday specs. Each spec picks the session it needs (guest, admin or signed out).
+    // Desktop projects leave out @mobile-only tests (phone-only UI such as the menu button).
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'], storageState: GUEST_AUTH_FILE },
       dependencies: ['setup'],
+      grepInvert: /@mobile-only/,
       testIgnore: /maintenance\.spec\.ts/,
     },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'], storageState: GUEST_AUTH_FILE },
       dependencies: ['setup'],
+      grepInvert: /@mobile-only/,
       testIgnore: /maintenance\.spec\.ts/,
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'], storageState: GUEST_AUTH_FILE },
       dependencies: ['setup'],
+      grepInvert: /@mobile-only/,
       testIgnore: /maintenance\.spec\.ts/,
     },
     {

@@ -87,8 +87,8 @@ test.describe('Navigation', () => {
     await expect(homePage.heading).toHaveText(testData.messages.notFound);
   });
 
-  test('TC05 - Mobile menu opens and navigates', { tag: '@mobile' }, async ({ page, homePage, isMobile }) => {
-    test.skip(!isMobile, 'The menu button only shows on small screens.');
+  // @mobile-only: the menu button is hidden from 1024px up, so desktop projects leave this out (see playwright.config.ts).
+  test('TC05 - Mobile menu opens and navigates', { tag: '@mobile-only' }, async ({ page, homePage }) => {
     await labelTest({ feature: 'Navigation', story: 'Mobile menu', severity: Severity.NORMAL });
 
     await test.step('Open the menu', async () => {
