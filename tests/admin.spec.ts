@@ -52,6 +52,9 @@ test.describe('Admin', { tag: '@admin' }, () => {
       page,
       adminBookingsPage,
     }) => {
+      // Two people in one test (a visitor books, then the admin works it through), so it needs more than 60 s
+      // on a busy machine: it took 45-60 s in Chromium and Firefox locally, and WebKit is slower still.
+      test.slow();
       await labelTest({ feature: 'Admin', story: 'Manage bookings', severity: Severity.BLOCKER });
       const guestEmail = uniqueEmail('admin-flow');
 

@@ -14,6 +14,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { RoomDetailsPage } from '../pages/RoomDetailsPage';
 import { RoomsPage } from '../pages/RoomsPage';
+import { waitForPageHydration } from '../utils/hydration';
 
 export type Pages = {
   homePage: HomePage;
@@ -39,6 +40,23 @@ export type Pages = {
  * A page object is only created when a test actually uses it.
  */
 export const test = base.extend<Pages>({
+  // After every full page load, wait for React to hydrate before the test clicks anything
+  // (see utils/hydration.ts). Client-side navigation needs no wait: the app is already hydrated.
+  page: async ({ page }, use) => {
+    const goto = page.goto.bind(page);
+    const reload = page.reload.bind(page);
+    page.goto = async (url, options) => {
+      const response = await goto(url, { waitUntil: 'domcontentloaded', ...options });
+      await waitForPageHydration(page);
+      return response;
+    };
+    page.reload = async (options) => {
+      const response = await reload({ waitUntil: 'domcontentloaded', ...options });
+      await waitForPageHydration(page);
+      return response;
+    };
+    await use(page);
+  },
   homePage: async ({ page }, use) => {
     await use(new HomePage(page));
   },

@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/pageFixtures';
+import type { Request } from '@playwright/test';
 import { registerAndSignIn } from '../fixtures/flows';
 import { labelTest, Severity } from '../utils/allure';
 import { env } from '../utils/env';
@@ -92,12 +93,27 @@ test.describe('Authentication', () => {
     await labelTest({ feature: 'Authentication', story: 'Logout', severity: Severity.NORMAL });
     const guest = savedGuestUser();
 
+    // Right after sign-in, Next.js prefetches the nav links. Each of those responses carries a refreshed session
+    // cookie, so one that lands after the sign-out would sign the guest back in. Wait for them to finish first.
+    const prefetches = new Set<Request>();
+    page.on('request', (request) => {
+      if (request.url().includes('_rsc=')) prefetches.add(request);
+    });
+    page.on('requestfinished', (request) => prefetches.delete(request));
+    page.on('requestfailed', (request) => prefetches.delete(request));
+
     await loginPage.goto();
     await loginPage.login(guest.email, guest.password);
     await expect(homePage.nav.signOut).toBeVisible();
+    await expect.poll(() => prefetches.size, { message: 'nav link prefetches should finish' }).toBe(0);
 
     await homePage.nav.signOut.click();
     await expect(homePage.nav.signUp).toBeVisible();
+    await expect
+      .poll(async () => (await page.context().cookies()).some((cookie) => cookie.name.includes('session-token')), {
+        message: 'the session cookie should be cleared',
+      })
+      .toBe(false);
     await page.goto('/user');
     await expect(page).toHaveURL(/\/login/);
   });

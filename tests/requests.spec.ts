@@ -54,11 +54,18 @@ test.describe('Dining and experiences', () => {
 
     await experiencesPage.goto();
     const dialog = await experiencesPage.openRequest(title);
-    // The date box has min=today, so the browser itself refuses to send an earlier date.
-    await dialog.send({ name: 'Test Guest', email: uniqueEmail('experience'), date: daysFromToday(-3) });
-
     const dateInput = dialog.root.getByLabel('Preferred date');
+    // Playwright's WebKit build for Windows has no date input (it falls back to type="text"), so min is not enforced.
+    // WebKit on Linux (CI) and macOS has one, so the check still runs there.
+    const hasDateInput = await dateInput.evaluate((input: HTMLInputElement) => input.type === 'date');
+    test.skip(!hasDateInput, 'This browser build has no date input, so it cannot enforce the minimum date.');
+
+    // The date box has min=today, so the browser itself refuses to send an earlier date.
+    await dialog.fill({ name: 'Test Guest', email: uniqueEmail('experience'), date: daysFromToday(-3) });
+    // Checked before sending: if a form were ever sent, React would reset it and the date would be gone.
     expect(await dateInput.evaluate((input: HTMLInputElement) => input.validity.rangeUnderflow)).toBe(true);
+
+    await dialog.sendButton.click();
     await expect(dialog.successMessage).toBeHidden();
     await expect(dialog.root).toBeVisible();
   });
